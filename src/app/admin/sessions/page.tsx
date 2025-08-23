@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabase } from "@/lib/supabaseClient";
+
+export const dynamic = "force-dynamic";  // ⬅️ stop static prerender at build
 
 type SessionRow = {
   id: string;
@@ -12,6 +14,7 @@ type SessionRow = {
 };
 
 export default async function AdminSessions() {
+  const supabase = getSupabase();  // ⬅️ create client at request time
   const { data: sessions, error } = await supabase
     .from("sessions")
     .select("id, title, time, venue, price, spots_left, roster");
@@ -19,7 +22,6 @@ export default async function AdminSessions() {
   if (error) {
     return <main className="p-6">Error loading sessions: {error.message}</main>;
   }
-
   if (!sessions || sessions.length === 0) {
     return (
       <main className="p-6 max-w-md mx-auto">

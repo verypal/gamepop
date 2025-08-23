@@ -1,9 +1,11 @@
-import { supabase } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
+import { getSupabase } from "@/lib/supabaseClient";
 
+export const dynamic = "force-dynamic";  // ⬅️ stop static prerender
 
 export default async function SessionPage({ params }: { params: { id: string } }) {
   const { id } = params;
+  const supabase = getSupabase();        // ⬅️ create client inside
 
   const { data: session, error } = await supabase
     .from("sessions")
@@ -30,15 +32,12 @@ export default async function SessionPage({ params }: { params: { id: string } }
       </div>
 
       <div className="space-y-2">
-        <CheckoutButton sessionId={id} />   {/* 👈 replaces the mock link */}
+        <CheckoutButton sessionId={id} />
         <button className="w-full rounded-xl border py-3">Join Waitlist</button>
         <button className="w-full text-gray-500 text-sm">View Policy</button>
       </div>
 
-
-      <p className="mt-6 text-xs text-gray-400">
-        Session ID: <code>{id}</code>
-      </p>
+      <p className="mt-6 text-xs text-gray-400">Session ID: <code>{id}</code></p>
     </main>
   );
 }
