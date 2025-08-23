@@ -10,10 +10,14 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  const sig = headers().get("stripe-signature") as string;
+  //const sig = headers().get("stripe-signature") as string;
+  //const rawBody = await req.text();
+
+  const hdrs = await headers();                            // 👈 await it
+  const sig = hdrs.get("stripe-signature") as string;      // 👈 now .get works
   const rawBody = await req.text();
 
-  try {
+try {
     const evt = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
 
     if (evt.type === "checkout.session.completed") {
