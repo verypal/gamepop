@@ -35,7 +35,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: `Webhook verify failed: ${err.message}` }, { status: 400 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: `Webhook verify failed: ${msg}` }, { status: 400 }); 
   }
 }

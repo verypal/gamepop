@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
 
