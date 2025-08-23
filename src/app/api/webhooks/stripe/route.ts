@@ -3,11 +3,9 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const dynamic = "force-dynamic";           // 👈 prevent build-time eval
+export const runtime = "nodejs";
+
 
 export async function POST(req: Request) {
   //const sig = headers().get("stripe-signature") as string;
@@ -17,6 +15,13 @@ export async function POST(req: Request) {
   const sig = hdrs.get("stripe-signature") as string;      // 👈 now .get works
   const rawBody = await req.text();
 
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+  
 try {
     const evt = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
 
