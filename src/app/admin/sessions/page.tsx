@@ -23,7 +23,8 @@ export default async function AdminSessions() {
       </main>
     );
   }
-  const hdrs = headers();
+  //...const hdrs = headers(); //this is a promise 
+  const hdrs = await headers();  // ✅ resolve it
   const proto = hdrs.get("x-forwarded-proto") ?? "http";
   const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
   const origin = `${proto}://${host}`;
