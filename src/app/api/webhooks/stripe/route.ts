@@ -12,7 +12,10 @@ export async function POST(req: Request) {
   //const rawBody = await req.text();
 
   const hdrs = await headers();                            // 👈 await it
-  const sig = hdrs.get("stripe-signature") as string;      // 👈 now .get works
+  const sig = hdrs.get("stripe-signature");                // 👈 now .get works
+  if (!sig) {
+    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
+  }
   const rawBody = await req.text();
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
