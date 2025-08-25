@@ -10,23 +10,26 @@ export default function CopyToClipboard({
   label?: string;
   className?: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function onCopy() {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (e) {
-      // fallback
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setStatus("copied");
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        await navigator.clipboard.writeText(ta.value);
+        document.body.removeChild(ta);
+        setStatus("copied");
+      } catch {
+        setStatus("error");
+      }
+    } finally {
+      setTimeout(() => setStatus("idle"), 1500);
     }
   }
 
@@ -43,7 +46,11 @@ export default function CopyToClipboard({
       ].join(" ")}
     >
       <span className="i-lucide-copy w-4 h-4" aria-hidden />{/* optional icon if you have lucide */}
-      {copied ? "Copied ✓" : label}
+      {status === "copied"
+        ? "Copied ✓"
+        : status === "error"
+        ? "Copy failed"
+        : label}
     </button>
   );
 }
