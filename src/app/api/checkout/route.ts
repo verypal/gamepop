@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     );
 
     // (Optional) dynamic origin if you want to avoid APP_BASE_URL
-    const hdrs = await headers();
+    const hdrs = headers();
     const proto = hdrs.get("x-forwarded-proto") ?? "http";
     const host  = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
     const origin = `${proto}://${host}`;

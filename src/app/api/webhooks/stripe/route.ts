@@ -11,8 +11,8 @@ export async function POST(req: Request) {
   //const sig = headers().get("stripe-signature") as string;
   //const rawBody = await req.text();
 
-  const hdrs = await headers();                            // 👈 await it
-  const sig = hdrs.get("stripe-signature") as string;      // 👈 now .get works
+  const hdrs = headers();
+  const sig = hdrs.get("stripe-signature") as string;
   const rawBody = await req.text();
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
