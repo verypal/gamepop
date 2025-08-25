@@ -6,7 +6,11 @@ import { buildShareText, type SessionRow } from "@/lib/shareText";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender at build
 
-export default async function AdminSessions() {
+export default async function AdminSessions({
+  searchParams,
+}: {
+  searchParams: { created?: string };
+}) {
   const supabase = getSupabase();  // ⬅️ create client at request time
   const { data: sessions, error } = await supabase
     .from("sessions")
@@ -31,12 +35,22 @@ export default async function AdminSessions() {
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Admin — Sessions</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Admin — Sessions</h1>
+        <Link href="/admin/sessions/new" className="text-sm text-blue-600 underline">
+          New
+        </Link>
+      </div>
       <ul className="space-y-3">
         {sessions.map((s: SessionRow) => {
           const share = buildShareText(s, origin + "/s/" + s.id);
           return (
-            <li key={s.id} className="rounded-2xl border p-4">
+            <li
+              key={s.id}
+              className={`rounded-2xl border p-4 ${
+                searchParams.created === s.id ? "bg-yellow-50" : ""
+              }`}
+            >
               <Link href={`/s/${s.id}`} className="block">
                 <div className="flex items-baseline justify-between">
                   <h2 className="text-lg font-medium">{s.title}</h2>

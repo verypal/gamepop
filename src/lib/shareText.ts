@@ -9,12 +9,11 @@ export type SessionRow = {
 };
 
 export function buildShareText(session: SessionRow, url: string): string {
-  return (
-    `${session.title}\n` +
-    `Time: ${session.time ?? ""}\n` +
-    `Venue: ${session.venue ?? ""}\n` +
-    `Price: ${session.price ?? ""}\n` +
-    `Spots left: ${session.spots_left ?? 0}\n` +
-    `Join: ${url}`
-  );
+  const lines: string[] = [session.title];
+  if (session.time) lines.push(`Time: ${session.time}`);
+  if (session.venue) lines.push(`Venue: ${session.venue}`);
+  if (session.price) lines.push(`Price: ${session.price}`);
+  lines.push(`Spots left: ${session.spots_left ?? 0}`);
+  lines.push(`Join: ${url}`);
+  return lines.filter(Boolean).join("\n");
 }
