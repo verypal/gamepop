@@ -6,8 +6,12 @@ import { buildShareText, type SessionRow } from "@/lib/shareText";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender at build
 
-export default async function AdminSessions() {
-  const supabase = getSupabase();  // ⬅️ create client at request time
+export default async function AdminSessions({
+  searchParams,
+}: {
+  searchParams: { new?: string };
+}) {
+  const supabase = getSupabase(); // ⬅️ create client at request time
   const { data: sessions, error } = await supabase
     .from("sessions")
     .select("id, title, time, venue, price, spots_left, roster");
@@ -15,38 +19,60 @@ export default async function AdminSessions() {
   if (error) {
     return <main className="p-6">Error loading sessions: {error.message}</main>;
   }
+  const highlightId = searchParams?.new;
   if (!sessions || sessions.length === 0) {
     return (
       <main className="p-6 max-w-md mx-auto">
         <h1 className="text-2xl font-semibold mb-4">Admin — Sessions</h1>
-        <p>No sessions yet. Add one in Supabase Table Editor.</p>
+        <p>
+          No sessions yet.{' '}
+          <Link href="/admin/sessions/new" className="text-blue-600 underline">
+            Add one
+          </Link>
+          .
+        </p>
       </main>
     );
   }
-  //...const hdrs = headers(); //this is a promise 
-  const hdrs = await headers();  // ✅ resolve it
+  //...const hdrs = headers(); //this is a promise
+  const hdrs = await headers(); // ✅ resolve it
   const proto = hdrs.get("x-forwarded-proto") ?? "http";
-  const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
+  const host =
+    hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
   const origin = `${proto}://${host}`;
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
       <h1 className="text-2xl font-semibold mb-4">Admin — Sessions</h1>
+      <Link
+        href="/admin/sessions/new"
+        className="inline-block mb-4 text-blue-600 underline"
+      >
+        Add new session
+      </Link>
       <ul className="space-y-3">
         {sessions.map((s: SessionRow) => {
           const share = buildShareText(s, origin + "/s/" + s.id);
+          const highlight = highlightId === s.id;
           return (
-            <li key={s.id} className="rounded-2xl border p-4">
+            <li
+              key={s.id}
+              className={`rounded-2xl border p-4 ${highlight ? "border-blue-500 bg-blue-50" : ""}`}
+            >
               <Link href={`/s/${s.id}`} className="block">
                 <div className="flex items-baseline justify-between">
                   <h2 className="text-lg font-medium">{s.title}</h2>
-                  <span className="text-sm text-gray-600">{s.spots_left ?? 0} left</span>
+                  <span className="text-sm text-gray-600">
+                    {s.spots_left ?? 0} left
+                  </span>
                 </div>
                 <p className="text-sm text-gray-600">
                   {s.time} • {s.venue}
                 </p>
                 {s.roster?.length ? (
-                  <p className="text-xs text-gray-500 mt-1">✅ {s.roster.join(", ")}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    ✅ {s.roster.join(", ")}
+                  </p>
                 ) : null}
               </Link>
               <CopyToClipboard text={share} className="mt-2" />
