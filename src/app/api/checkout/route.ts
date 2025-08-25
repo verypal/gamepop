@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // (Optional) dynamic origin if you want to avoid APP_BASE_URL
+    // Dynamic origin to avoid APP_BASE_URL
     const hdrs = await headers();
     const proto = hdrs.get("x-forwarded-proto") ?? "http";
     const host  = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
         quantity: 1
       }],
       customer_creation: "if_required",
-      success_url: `${process.env.APP_BASE_URL}/success?cs={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_BASE_URL}/s/${s.id}`,
+      success_url: `${origin}/success?cs={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/s/${s.id}`,
       metadata: { gamepop_session_id: s.id }
     });
 
