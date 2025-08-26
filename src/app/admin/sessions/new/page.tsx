@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 interface FormState {
   title: string;
-  venue: string;
+  location: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -19,7 +19,7 @@ interface FormState {
 
 interface Errors {
   title?: string;
-  venue?: string;
+  location?: string;
   date?: string;
   startTime?: string;
   endTime?: string;
@@ -31,7 +31,7 @@ export default function NewSessionPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>({
     title: "",
-    venue: "",
+    location: "",
     date: "",
     startTime: "",
     endTime: "",
@@ -52,7 +52,7 @@ export default function NewSessionPage() {
   function validateField(name: string, value: string): string | undefined {
     switch (name) {
       case "title":
-      case "venue":
+      case "location":
       case "date":
       case "startTime":
         if (!value) return "Required";
@@ -118,19 +118,19 @@ export default function NewSessionPage() {
           )}
         </div>
         <div>
-          <label htmlFor="venue" className="block text-sm font-medium mb-1">
+          <label htmlFor="location" className="block text-sm font-medium mb-1">
             Venue
           </label>
           <input
-            id="venue"
-            name="venue"
-            value={form.venue}
+            id="location"
+            name="location"
+            value={form.location}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`w-full border rounded p-2 ${errors.venue ? "border-red-500" : ""}`}
+            className={`w-full border rounded p-2 ${errors.location ? "border-red-500" : ""}`}
           />
-          {errors.venue && (
-            <p className="text-red-500 text-sm mt-1">{errors.venue}</p>
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">{errors.location}</p>
           )}
         </div>
         <div>
