@@ -24,7 +24,11 @@ export default async function SessionPage({ params }: { params: { id: string } }
       <p className="text-sm text-gray-600 mb-4">{session.venue}</p>
 
       <div className="rounded-2xl border p-4 mb-4">
-        <p className="mb-1">Price: <strong>{session.price}</strong></p>
+        {session.payments_enabled ? (
+          <p className="mb-1">
+            Price: <strong>{session.price} {session.currency}</strong>
+          </p>
+        ) : null}
         <p className="mb-2">Spots left: <strong>{session.spots_left}</strong></p>
         <p className="text-sm text-gray-600">
           Confirmed: {session.roster?.map((n: string) => `✅ ${n}`).join(", ")}
