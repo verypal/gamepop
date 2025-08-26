@@ -21,6 +21,10 @@ export async function createSession(
   const roster = rosterStr
     ? rosterStr.split(",").map((s) => s.trim()).filter(Boolean)
     : null;
+  const autoMarkedStr = (formData.get("autoMarked") as string) || "";
+  const auto_marked = autoMarkedStr
+    ? autoMarkedStr.split(",").map((s) => s.trim()).filter(Boolean)
+    : null;
 
   const { data, error } = await supabase
     .from("sessions")
@@ -31,6 +35,7 @@ export async function createSession(
       price,
       spots_left: spots,
       roster,
+      auto_marked,
     })
     .select("id")
     .single();

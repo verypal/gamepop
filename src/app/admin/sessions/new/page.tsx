@@ -2,6 +2,7 @@
 
 import { useFormState } from "react-dom";
 import { createSession, type FormState } from "./actions";
+import RosterMultiSelect from "@/components/RosterMultiSelect";
 
 const initialState: FormState = { message: null };
 
@@ -32,10 +33,7 @@ export default function NewSessionPage() {
           <label className="block text-sm font-medium mb-1">Spots</label>
           <input name="spots" type="number" required className="w-full border rounded p-2" />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Roster (comma-separated)</label>
-          <input name="roster" className="w-full border rounded p-2" />
-        </div>
+        <RosterMultiSelect ownerId="owner1" maxPlayers={20} />
         {state.message && (
           <p className="text-red-600">{state.message}</p>
         )}
