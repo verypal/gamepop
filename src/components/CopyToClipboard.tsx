@@ -17,16 +17,17 @@ export default function CopyToClipboard({
       await navigator.clipboard.writeText(text);
       setStatus("copied");
     } catch {
+      const ta = document.createElement("textarea");
       try {
-        const ta = document.createElement("textarea");
         ta.value = text;
         document.body.appendChild(ta);
         ta.select();
-        await navigator.clipboard.writeText(ta.value);
-        document.body.removeChild(ta);
+        document.execCommand("copy");
         setStatus("copied");
       } catch {
         setStatus("error");
+      } finally {
+        document.body.removeChild(ta);
       }
     } finally {
       setTimeout(() => setStatus("idle"), 1500);
