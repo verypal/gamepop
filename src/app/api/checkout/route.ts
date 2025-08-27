@@ -1,26 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
-
+import { getSupabase } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {
     const { sessionId } = await req.json();
 
-    //build-time safe: create clients inside handler. 
+    //build-time safe: create clients inside handler.
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = getSupabase();
 
     // Dynamic origin to avoid APP_BASE_URL
     const hdrs = await headers();
     const proto = hdrs.get("x-forwarded-proto") ?? "http";
     const host  = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
     const origin = `${proto}://${host}`;
-
 
     const { data: s, error } = await supabase
       .from("sessions")
@@ -54,3 +49,4 @@ export async function POST(req: NextRequest) {
 }
 
 }
+
