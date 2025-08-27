@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
 import sessionForm, { SessionFormData } from "../sessionForm";
 import { createSession } from "../actions";
 
@@ -20,16 +21,24 @@ export default function SchedulePage() {
     setForm((prev) => ({ ...prev, ...data }));
   }, []);
 
-  function handleSubmit() {
-    sessionForm.clear();
-  }
+  const router = useRouter();
 
-  const [state, formAction] = useFormState(createSession, { message: null });
+  const [state, formAction] = useFormState(createSession, {
+    message: null,
+    sessionId: null,
+  });
+
+  useEffect(() => {
+    if (state.sessionId) {
+      sessionForm.clear();
+      router.push(`/admin/sessions?new=${state.sessionId}`);
+    }
+  }, [state.sessionId, router]);
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
       <h1 className="text-2xl font-semibold mb-4">Schedule</h1>
-      <form action={formAction} onSubmit={handleSubmit} className="space-y-4">
+      <form action={formAction} className="space-y-4">
         <div>
           <p className="text-sm font-medium mb-1">Title</p>
           <p>{form.title}</p>
