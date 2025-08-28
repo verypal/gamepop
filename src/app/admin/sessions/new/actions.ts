@@ -1,10 +1,10 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { getSupabase } from "@/lib/supabaseClient";
 
 export type FormState = {
   message: string | null;
+  id?: number;
 };
 
 export async function createSession(
@@ -39,7 +39,6 @@ export async function createSession(
     return { message: error.message };
   }
 
-  redirect(`/admin/sessions?new=${data.id}`);
-  return { message: null };
+  return { message: null, id: data.id };
 }
 
