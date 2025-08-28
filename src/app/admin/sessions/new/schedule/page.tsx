@@ -12,7 +12,9 @@ export default function SchedulePage() {
   const [state, dispatch] = useFormState(createSession, initialState);
   const router = useRouter();
   const [title, setTitle] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [venue, setVenue] = useState("");
 
   useEffect(() => {
@@ -21,11 +23,10 @@ export default function SchedulePage() {
       try {
         const data = JSON.parse(stored);
         setTitle(data.title || "");
-        const t = data.date && data.startTime
-          ? `${data.date} ${data.startTime}${data.endTime ? `-${data.endTime}` : ""}`
-          : "";
-        setTime(t);
-        setVenue(data.location || "");
+        setDate(data.date || "");
+        setStartTime(data.startTime || "");
+        setEndTime(data.endTime || "");
+        setVenue(data.venue || data.location || "");
       } catch {
         // ignore malformed storage
       }
@@ -61,11 +62,13 @@ export default function SchedulePage() {
           </label>
           <input
             id="time"
-            name="time"
-            value={time}
+            value={date && startTime ? `${date} ${startTime}${endTime ? `-${endTime}` : ""}` : ""}
             readOnly
             className="w-full border rounded p-2 bg-gray-100"
           />
+          <input type="hidden" name="date" value={date} />
+          <input type="hidden" name="startTime" value={startTime} />
+          <input type="hidden" name="endTime" value={endTime} />
         </div>
         <div>
           <label htmlFor="venue" className="block text-sm font-medium mb-1">
