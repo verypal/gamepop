@@ -1,12 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { createSession, type FormState } from "../actions";
 
 const initialState: FormState = { message: null };
+const storageKey = "sessionForm";
 
 export default function SchedulePage() {
   const [state, dispatch] = useFormState(createSession, initialState);
+  const [title, setTitle] = useState("");
+  const [time, setTime] = useState("");
+  const [venue, setVenue] = useState("");
+
+  useEffect(() => {
+    const stored = typeof window !== "undefined" && localStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        setTitle(data.title || "");
+        const t = data.date && data.startTime
+          ? `${data.date} ${data.startTime}${data.endTime ? `-${data.endTime}` : ""}`
+          : "";
+        setTime(t);
+        setVenue(data.location || "");
+      } catch {
+        // ignore malformed storage
+      }
+    }
+  }, []);
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
@@ -16,19 +38,37 @@ export default function SchedulePage() {
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             Title
           </label>
-          <input id="title" name="title" className="w-full border rounded p-2" />
+          <input
+            id="title"
+            name="title"
+            value={title}
+            readOnly
+            className="w-full border rounded p-2 bg-gray-100"
+          />
         </div>
         <div>
           <label htmlFor="time" className="block text-sm font-medium mb-1">
             Time
           </label>
-          <input id="time" name="time" className="w-full border rounded p-2" />
+          <input
+            id="time"
+            name="time"
+            value={time}
+            readOnly
+            className="w-full border rounded p-2 bg-gray-100"
+          />
         </div>
         <div>
           <label htmlFor="venue" className="block text-sm font-medium mb-1">
             Venue
           </label>
-          <input id="venue" name="venue" className="w-full border rounded p-2" />
+          <input
+            id="venue"
+            name="venue"
+            value={venue}
+            readOnly
+            className="w-full border rounded p-2 bg-gray-100"
+          />
         </div>
         <div>
           <label htmlFor="price" className="block text-sm font-medium mb-1">
