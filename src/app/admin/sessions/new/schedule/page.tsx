@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
 import { createSession, type FormState } from "../actions";
 
 const initialState: FormState = { message: null };
@@ -9,6 +10,7 @@ const storageKey = "sessionForm";
 
 export default function SchedulePage() {
   const [state, dispatch] = useFormState(createSession, initialState);
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("");
   const [venue, setVenue] = useState("");
@@ -29,6 +31,13 @@ export default function SchedulePage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!state.message && state.id) {
+      localStorage.removeItem(storageKey);
+      router.replace(`/admin/sessions?new=${state.id}`);
+    }
+  }, [state, router]);
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
