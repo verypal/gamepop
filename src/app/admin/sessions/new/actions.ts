@@ -13,8 +13,11 @@ export async function createSession(
 ): Promise<FormState> {
   const supabase = getSupabase();
   const title = formData.get("title") as string;
-  const time = formData.get("time") as string;
+  const date = formData.get("date") as string;
+  const startTime = formData.get("startTime") as string;
+  const endTime = formData.get("endTime") as string;
   const venue = formData.get("venue") as string;
+  const time = endTime ? `${date} ${startTime}-${endTime}` : `${date} ${startTime}`;
   const price = formData.get("price") as string;
   const spots = Number(formData.get("spots"));
   const rosterStr = (formData.get("roster") as string) || "";

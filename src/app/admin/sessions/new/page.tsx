@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 interface FormState {
   title: string;
-  location: string;
+  venue: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -19,7 +19,7 @@ interface FormState {
 
 interface Errors {
   title?: string;
-  location?: string;
+  venue?: string;
   date?: string;
   startTime?: string;
   endTime?: string;
@@ -31,7 +31,7 @@ export default function NewSessionPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>({
     title: "",
-    location: "",
+    venue: "",
     date: "",
     startTime: "",
     endTime: "",
@@ -42,7 +42,12 @@ export default function NewSessionPage() {
     const stored = localStorage.getItem(storageKey);
     if (stored) {
       try {
-        setForm(JSON.parse(stored));
+        const data = JSON.parse(stored);
+        if (data.location && !data.venue) {
+          data.venue = data.location;
+          delete data.location;
+        }
+        setForm(data);
       } catch {
         /* ignore */
       }
@@ -52,7 +57,7 @@ export default function NewSessionPage() {
   function validateField(name: string, value: string): string | undefined {
     switch (name) {
       case "title":
-      case "location":
+      case "venue":
       case "date":
       case "startTime":
         if (!value) return "Required";
@@ -118,19 +123,19 @@ export default function NewSessionPage() {
           )}
         </div>
         <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-1">
+          <label htmlFor="venue" className="block text-sm font-medium mb-1">
             Venue
           </label>
           <input
-            id="location"
-            name="location"
-            value={form.location}
+            id="venue"
+            name="venue"
+            value={form.venue}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`w-full border rounded p-2 ${errors.location ? "border-red-500" : ""}`}
+            className={`w-full border rounded p-2 ${errors.venue ? "border-red-500" : ""}`}
           />
-          {errors.location && (
-            <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+          {errors.venue && (
+            <p className="text-red-500 text-sm mt-1">{errors.venue}</p>
           )}
         </div>
         <div>
