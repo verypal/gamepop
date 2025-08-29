@@ -83,27 +83,36 @@ export default function SchedulePage() {
           />
         </div>
         <div>
-          <label htmlFor="price" className="block text-sm font-medium mb-1">
-            Price
-          </label>
-          <input id="price" name="price" className="w-full border rounded p-2" />
-        </div>
-        <div>
-          <label htmlFor="spots" className="block text-sm font-medium mb-1">
-            Spots
+          <label htmlFor="minPlayers" className="block text-sm font-medium mb-1">
+            Minimum Players
           </label>
           <input
-            id="spots"
-            name="spots"
+            id="minPlayers"
+            name="minPlayers"
             type="number"
             className="w-full border rounded p-2"
           />
         </div>
         <div>
-          <label htmlFor="roster" className="block text-sm font-medium mb-1">
-            Roster (comma-separated)
+          <label htmlFor="maxPlayers" className="block text-sm font-medium mb-1">
+            Maximum Players
           </label>
-          <input id="roster" name="roster" className="w-full border rounded p-2" />
+          <input
+            id="maxPlayers"
+            name="maxPlayers"
+            type="number"
+            className="w-full border rounded p-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            className="w-full border rounded p-2"
+          />
         </div>
         {state.message && (
           <p className="text-red-500 text-sm">{state.message}</p>
