@@ -19,17 +19,16 @@ export default async function SessionPage({ params }: { params: { id: string } }
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-1">{session.title}</h1>
+      <h1 className="text-2xl font-semibold mb-1">Session {session.id}</h1>
       <p className="text-sm text-gray-600">{session.time}</p>
-      <p className="text-sm text-gray-600 mb-4">{session.venue}</p>
-
-      <div className="rounded-2xl border p-4 mb-4">
-        <p className="mb-1">Price: <strong>{session.price}</strong></p>
-        <p className="mb-2">Spots left: <strong>{session.spots_left}</strong></p>
-        <p className="text-sm text-gray-600">
-          Confirmed: {session.roster?.map((n: string) => `✅ ${n}`).join(", ")}
-        </p>
-      </div>
+      <p className="text-sm text-gray-600 mb-4">
+        Players: {session.min_players ?? 0}-{session.max_players ?? 0}
+      </p>
+      {session.message && (
+        <div className="rounded-2xl border p-4 mb-4">
+          <p>{session.message}</p>
+        </div>
+      )}
 
       <div className="space-y-2">
         <CheckoutButton sessionId={id} />

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const { data: s, error } = await supabase
       .from("sessions")
-      .select("id,title,payg_price_cents")
+      .select("id,payg_price_cents")
       .eq("id", sessionId)
       .single();
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: "gbp",
           unit_amount: s.payg_price_cents,
-          product_data: { name: s.title }
+          product_data: { name: `Session ${s.id}` }
         },
         quantity: 1
       }],

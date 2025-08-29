@@ -14,7 +14,7 @@ export default async function AdminSessions({
   const supabase = getSupabase(); // ⬅️ create client at request time
   const { data: sessions, error } = await supabase
     .from("sessions")
-    .select("id, title, time, venue, price, spots_left, roster");
+    .select("id, time, min_players, max_players, message");
 
   if (error) {
     return <main className="p-6">Error loading sessions: {error.message}</main>;
@@ -61,19 +61,14 @@ export default async function AdminSessions({
             >
               <Link href={`/s/${s.id}`} className="block">
                 <div className="flex items-baseline justify-between">
-                  <h2 className="text-lg font-medium">{s.title}</h2>
+                  <h2 className="text-lg font-medium">{s.time}</h2>
                   <span className="text-sm text-gray-600">
-                    {s.spots_left ?? 0} left
+                    {s.min_players ?? 0}-{s.max_players ?? 0}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">
-                  {s.time} • {s.venue}
-                </p>
-                {s.roster?.length ? (
-                  <p className="text-xs text-gray-500 mt-1">
-                    ✅ {s.roster.join(", ")}
-                  </p>
-                ) : null}
+                {s.message && (
+                  <p className="text-sm text-gray-600">{s.message}</p>
+                )}
               </Link>
               <CopyToClipboard text={share} className="mt-2" />
               <a
