@@ -100,6 +100,28 @@ export default function SchedulePage() {
           />
         </div>
         <div>
+          <label htmlFor="minPlayers" className="block text-sm font-medium mb-1">
+            Min Players
+          </label>
+          <input
+            id="minPlayers"
+            name="minPlayers"
+            type="number"
+            className="w-full border rounded p-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="maxPlayers" className="block text-sm font-medium mb-1">
+            Max Players
+          </label>
+          <input
+            id="maxPlayers"
+            name="maxPlayers"
+            type="number"
+            className="w-full border rounded p-2"
+          />
+        </div>
+        <div>
           <label htmlFor="roster" className="block text-sm font-medium mb-1">
             Roster (comma-separated)
           </label>

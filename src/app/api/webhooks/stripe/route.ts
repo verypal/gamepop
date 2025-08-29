@@ -33,17 +33,32 @@ try {
       const sessionId = s.metadata?.gamepop_session_id;
       const payerName = s.customer_details?.name || "Player";
 
-      if (sessionId) {
-        const { data: current } = await supabase
-          .from("sessions").select("spots_left, roster").eq("id", sessionId).single();
+        if (sessionId) {
+          const { data: current } = await supabase
+            .from("sessions").select("spots_left, roster").eq("id", sessionId).single();
 
-        const newSpots = Math.max(0, (current?.spots_left ?? 0) - 1);
-        const newRoster = [...(current?.roster ?? []), payerName];
+          const newSpots = Math.max(0, (current?.spots_left ?? 0) - 1);
+          const newRoster = [...(current?.roster ?? []), payerName];
 
-        await supabase.from("sessions")
-          .update({ spots_left: newSpots, roster: newRoster })
-          .eq("id", sessionId);
-      }
+          const { error: updateError } = await supabase
+            .from("sessions")
+            .update({ spots_left: newSpots, roster: newRoster })
+            .eq("id", sessionId);
+
+          if (updateError) {
+            let message = updateError.message;
+            if (updateError.code === "23514") {
+              if (updateError.message.includes("sessions_min_players_check")) {
+                message = "Minimum players must be at least 1.";
+              } else if (updateError.message.includes("sessions_max_players_ge_min")) {
+                message = "Maximum players must be at least the minimum.";
+              } else if (updateError.message.includes("sessions_max_players_le_100")) {
+                message = "Maximum players must be 100 or fewer.";
+              }
+            }
+            return NextResponse.json({ error: message }, { status: 400 });
+          }
+        }
     }
 
     return NextResponse.json({ ok: true });
