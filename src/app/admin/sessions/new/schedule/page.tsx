@@ -11,22 +11,24 @@ const storageKey = "sessionForm";
 export default function SchedulePage() {
   const [state, dispatch] = useFormState(createSession, initialState);
   const router = useRouter();
-  const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [venue, setVenue] = useState("");
+  const [minPlayers, setMinPlayers] = useState("");
+  const [maxPlayers, setMaxPlayers] = useState("");
+  const [minError, setMinError] = useState<string | null>(null);
+  const [maxError, setMaxError] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const [msgError, setMsgError] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = typeof window !== "undefined" && localStorage.getItem(storageKey);
     if (stored) {
       try {
         const data = JSON.parse(stored);
-        setTitle(data.title || "");
         setDate(data.date || "");
         setStartTime(data.startTime || "");
         setEndTime(data.endTime || "");
-        setVenue(data.venue || data.location || "");
       } catch {
         // ignore malformed storage
       }
@@ -40,29 +42,76 @@ export default function SchedulePage() {
     }
   }, [state, router]);
 
+  const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMinPlayers(value);
+    const num = Number(value);
+    if (!value || num < 1) {
+      setMinError("Min players must be at least 1");
+    } else {
+      setMinError(null);
+      if (maxPlayers) {
+        const max = Number(maxPlayers);
+        if (max < num) {
+          setMaxError("Max players must be ≥ min players");
+        } else if (max > 100) {
+          setMaxError("Max players cannot exceed 100");
+        } else {
+          setMaxError(null);
+        }
+      }
+    }
+  };
+
+  const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMaxPlayers(value);
+    const num = Number(value);
+    const min = Number(minPlayers);
+    if (!value) {
+      setMaxError("Max players is required");
+    } else if (num < min) {
+      setMaxError("Max players must be ≥ min players");
+    } else if (num > 100) {
+      setMaxError("Max players cannot exceed 100");
+    } else {
+      setMaxError(null);
+    }
+  };
+
+  const handleMessageChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setMessage(value);
+    if (value.length > 500) {
+      setMsgError("Message cannot exceed 500 characters");
+    } else {
+      setMsgError(null);
+    }
+  };
+
+  const handleSubmit = async (formData: FormData) => {
+    const msg = (formData.get("message") as string) || "";
+    formData.set("message", msg.replace(/\n/g, " "));
+    return dispatch(formData);
+  };
+
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
       <h1 className="text-2xl font-semibold mb-4">Schedule Session</h1>
-      <form action={dispatch} className="space-y-4">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title
-          </label>
-          <input
-            id="title"
-            name="title"
-            value={title}
-            readOnly
-            className="w-full border rounded p-2 bg-gray-100"
-          />
-        </div>
+      <form action={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="time" className="block text-sm font-medium mb-1">
             Time
           </label>
           <input
             id="time"
-            value={date && startTime ? `${date} ${startTime}${endTime ? `-${endTime}` : ""}` : ""}
+            value={
+              date && startTime
+                ? `${date} ${startTime}${endTime ? `-${endTime}` : ""}`
+                : ""
+            }
             readOnly
             className="w-full border rounded p-2 bg-gray-100"
           />
@@ -71,39 +120,64 @@ export default function SchedulePage() {
           <input type="hidden" name="endTime" value={endTime} />
         </div>
         <div>
-          <label htmlFor="venue" className="block text-sm font-medium mb-1">
-            Venue
+          <label
+            htmlFor="minPlayers"
+            className="block text-sm font-medium mb-1"
+          >
+            Min Players
           </label>
           <input
-            id="venue"
-            name="venue"
-            value={venue}
-            readOnly
-            className="w-full border rounded p-2 bg-gray-100"
-          />
-        </div>
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium mb-1">
-            Price
-          </label>
-          <input id="price" name="price" className="w-full border rounded p-2" />
-        </div>
-        <div>
-          <label htmlFor="spots" className="block text-sm font-medium mb-1">
-            Spots
-          </label>
-          <input
-            id="spots"
-            name="spots"
+            id="minPlayers"
+            name="minPlayers"
             type="number"
+            required
+            min={1}
+            max={100}
+            value={minPlayers}
+            onChange={handleMinChange}
             className="w-full border rounded p-2"
           />
+          {minError && <p className="text-red-500 text-sm">{minError}</p>}
         </div>
         <div>
-          <label htmlFor="roster" className="block text-sm font-medium mb-1">
-            Roster (comma-separated)
+          <label
+            htmlFor="maxPlayers"
+            className="block text-sm font-medium mb-1"
+          >
+            Max Players
           </label>
-          <input id="roster" name="roster" className="w-full border rounded p-2" />
+          <input
+            id="maxPlayers"
+            name="maxPlayers"
+            type="number"
+            required
+            min={minPlayers ? Number(minPlayers) : 1}
+            max={100}
+            value={maxPlayers}
+            onChange={handleMaxChange}
+            className="w-full border rounded p-2"
+          />
+          {maxError && <p className="text-red-500 text-sm">{maxError}</p>}
+        </div>
+        <div>
+          <label
+            htmlFor="message"
+            className="block text-sm font-medium mb-1"
+          >
+            Message (optional)
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            value={message}
+            onChange={handleMessageChange}
+            rows={4}
+            className="w-full border rounded p-2"
+          />
+          <div className="text-sm text-gray-500 mt-1">
+            {message.length} / 500
+          </div>
+          {msgError && <p className="text-red-500 text-sm">{msgError}</p>}
         </div>
         {state.message && (
           <p className="text-red-500 text-sm">{state.message}</p>
