@@ -9,10 +9,29 @@ export type SessionRow = {
 };
 
 export function buildShareText(session: SessionRow, url: string): string {
-  return (
-    `${session.time ?? ""}\n` +
-    `Players: ${session.min_players ?? ""}-${session.max_players ?? ""}\n` +
-    `${session.message ?? ""}\n` +
-    `Join: ${url}`
+  const lines: string[] = [];
+
+  if (session.title) {
+    lines.push(session.title);
+  }
+
+  if (session.venue) {
+    lines.push(session.venue);
+  }
+
+  if (session.time) {
+    lines.push(session.time);
+  }
+
+  lines.push(
+    `Players: ${session.min_players ?? ""}-${session.max_players ?? ""}`
   );
+
+  if (session.message) {
+    lines.push(session.message);
+  }
+
+  lines.push(`Join: ${url}`);
+
+  return lines.join("\n");
 }
