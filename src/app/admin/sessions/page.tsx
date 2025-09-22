@@ -14,7 +14,7 @@ export default async function AdminSessions({
   const supabase = getSupabase(); // ⬅️ create client at request time
   const { data: sessions, error } = await supabase
     .from("sessions")
-    .select("id, time, min_players, max_players, message");
+    .select("id, title, venue, time, min_players, max_players, message");
 
   if (error) {
     return <main className="p-6">Error loading sessions: {error.message}</main>;
