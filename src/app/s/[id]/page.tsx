@@ -19,8 +19,13 @@ export default async function SessionPage({ params }: { params: { id: string } }
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-1">Session {session.id}</h1>
+      <h1 className="text-2xl font-semibold mb-1">
+        {session.title ?? `Session ${session.id}`}
+      </h1>
       <p className="text-sm text-gray-600">{session.time}</p>
+      {session.venue && (
+        <p className="text-sm text-gray-600">Venue: {session.venue}</p>
+      )}
       <p className="text-sm text-gray-600 mb-4">
         Players: {session.min_players ?? 0}-{session.max_players ?? 0}
       </p>
