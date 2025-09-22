@@ -1,5 +1,7 @@
 export type SessionRow = {
   id: string;
+  title: string | null;
+  venue: string | null;
   time: string | null;
   min_players: number | null;
   max_players: number | null;

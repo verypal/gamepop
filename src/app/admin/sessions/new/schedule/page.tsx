@@ -50,11 +50,11 @@ export default function SchedulePage() {
           </label>
           <input
             id="title"
-            name="title"
             value={title}
             readOnly
             className="w-full border rounded p-2 bg-gray-100"
           />
+          <input type="hidden" name="title" value={title} />
         </div>
         <div>
           <label htmlFor="time" className="block text-sm font-medium mb-1">
@@ -76,11 +76,11 @@ export default function SchedulePage() {
           </label>
           <input
             id="venue"
-            name="venue"
             value={venue}
             readOnly
             className="w-full border rounded p-2 bg-gray-100"
           />
+          <input type="hidden" name="venue" value={venue} />
         </div>
         <div>
           <label htmlFor="minPlayers" className="block text-sm font-medium mb-1">

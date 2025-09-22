@@ -12,10 +12,12 @@ export async function createSession(
   formData: FormData
 ): Promise<FormState> {
   const supabase = getSupabase();
+  const title = ((formData.get("title") as string) || "").trim();
   const date = formData.get("date") as string;
   const startTime = formData.get("startTime") as string;
   const endTime = formData.get("endTime") as string;
   const time = endTime ? `${date} ${startTime}-${endTime}` : `${date} ${startTime}`;
+  const venue = ((formData.get("venue") as string) || "").trim();
   const minPlayers = Number(formData.get("minPlayers"));
   const maxPlayers = Number(formData.get("maxPlayers"));
   const message = ((formData.get("message") as string) || "").replace(/\n/g, " ").trim() || null;
@@ -23,6 +25,8 @@ export async function createSession(
   const { data, error } = await supabase
     .from("sessions")
     .insert({
+      title: title || null,
+      venue: venue || null,
       time,
       min_players: isNaN(minPlayers) ? null : minPlayers,
       max_players: isNaN(maxPlayers) ? null : maxPlayers,
