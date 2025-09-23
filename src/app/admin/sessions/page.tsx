@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { getSupabase } from "@/lib/supabaseClient";
+
 import CopyToClipboard from "@/components/CopyToClipboard";
+import { getSupabase } from "@/lib/supabaseClient";
 import { buildShareText, type SessionRow } from "@/lib/shareText";
+
+import DeleteSessionButton from "./components/DeleteSessionButton";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender at build
 
@@ -98,31 +101,64 @@ export default async function AdminSessions({
                 key={s.id}
                 className={`rounded-2xl border p-4 ${highlight ? "border-blue-500 bg-blue-50" : ""}`}
               >
-                <Link href={`/s/${s.id}`} className="block">
-                  <div className="flex items-baseline justify-between">
-                    <h2 className="text-lg font-medium">
-                      {s.title ?? "Untitled session"}
-                    </h2>
-                    <span className="text-sm text-gray-600">
-                      {s.min_players ?? 0}-{s.max_players ?? 0}
-                    </span>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <Link
+                    href={`/s/${s.id}`}
+                    className="flex-1 space-y-1"
+                    aria-label={`View session ${s.title ?? "Untitled session"}`}
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h2 className="text-lg font-medium">
+                        {s.title ?? "Untitled session"}
+                      </h2>
+                      <span className="text-sm text-gray-600">
+                        {s.min_players ?? 0}-{s.max_players ?? 0}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">{s.time}</p>
+                    {s.venue && (
+                      <p className="text-sm text-gray-600">Venue: {s.venue}</p>
+                    )}
+                    {s.message && (
+                      <p className="text-sm text-gray-600">{s.message}</p>
+                    )}
+                  </Link>
+                  <div className="flex flex-row flex-wrap gap-2 sm:w-40 sm:flex-col">
+                    <Link
+                      href={`/s/${s.id}`}
+                      className="rounded border border-gray-300 px-3 py-1 text-sm text-blue-600 transition hover:bg-blue-50"
+                      title="View session"
+                      aria-label="View session"
+                    >
+                      View
+                    </Link>
+                    <Link
+                      href={`/admin/sessions/${s.id}/edit`}
+                      className="rounded border border-gray-300 px-3 py-1 text-sm text-blue-600 transition hover:bg-blue-50"
+                      title="Edit session"
+                      aria-label="Edit session"
+                    >
+                      Edit
+                    </Link>
+                    <DeleteSessionButton sessionId={s.id} />
                   </div>
-                  <p className="text-sm text-gray-600">{s.time}</p>
-                  {s.venue && (
-                    <p className="text-sm text-gray-600">Venue: {s.venue}</p>
-                  )}
-                  {s.message && (
-                    <p className="text-sm text-gray-600">{s.message}</p>
-                  )}
-                </Link>
-                <CopyToClipboard text={share} className="mt-2" />
-                <a
-                  href={"https://wa.me/?text=" + encodeURIComponent(share)}
-                  target="_blank"
-                  className="block mt-1 text-sm text-blue-600 underline"
-                >
-                  Open in WhatsApp
-                </a>
+                </div>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  <CopyToClipboard
+                    text={share}
+                    className="w-full justify-center sm:w-auto"
+                  />
+                  <a
+                    href={"https://wa.me/?text=" + encodeURIComponent(share)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 underline"
+                    title="Share via WhatsApp"
+                    aria-label="Share via WhatsApp"
+                  >
+                    Open in WhatsApp
+                  </a>
+                </div>
               </li>
             );
           })}

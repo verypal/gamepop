@@ -18,8 +18,15 @@ export async function createSession(
   const endTime = formData.get("endTime") as string;
   const time = endTime ? `${date} ${startTime}-${endTime}` : `${date} ${startTime}`;
   const venue = ((formData.get("venue") as string) || "").trim();
-  const minPlayers = Number(formData.get("minPlayers"));
-  const maxPlayers = Number(formData.get("maxPlayers"));
+  const parseNumberField = (value: FormDataEntryValue | null): number | null => {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Number(trimmed);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+  const minPlayers = parseNumberField(formData.get("minPlayers"));
+  const maxPlayers = parseNumberField(formData.get("maxPlayers"));
   const message = ((formData.get("message") as string) || "").replace(/\n/g, " ").trim() || null;
 
   const { data, error } = await supabase
@@ -28,8 +35,8 @@ export async function createSession(
       title: title || null,
       venue: venue || null,
       time,
-      min_players: isNaN(minPlayers) ? null : minPlayers,
-      max_players: isNaN(maxPlayers) ? null : maxPlayers,
+      min_players: minPlayers,
+      max_players: maxPlayers,
       message,
     })
     .select("id")
