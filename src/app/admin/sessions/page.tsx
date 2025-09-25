@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getSupabase } from "@/lib/supabaseClient";
 import CopyToClipboard from "@/components/CopyToClipboard";
 import { buildShareText, type SessionRow } from "@/lib/shareText";
+import { deleteSession } from "./actions";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender at build
 
@@ -123,6 +124,23 @@ export default async function AdminSessions({
                 >
                   Open in WhatsApp
                 </a>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={`/admin/sessions/${s.id}/edit`}
+                    className="rounded border border-blue-600 px-3 py-2 text-sm font-medium text-blue-600"
+                  >
+                    Edit
+                  </Link>
+                  <form action={deleteSession}>
+                    <input type="hidden" name="id" value={s.id} />
+                    <button
+                      type="submit"
+                      className="rounded border border-red-600 px-3 py-2 text-sm font-medium text-red-600"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </li>
             );
           })}
