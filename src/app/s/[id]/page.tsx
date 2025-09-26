@@ -1,23 +1,30 @@
 import Link from "next/link";
-import CheckoutButton from "@/components/CheckoutButton";
+import RsvpControls from "@/components/RsvpControls";
 import { getSupabase } from "@/lib/supabaseClient";
 import { deleteSession } from "@/app/admin/sessions/actions";
+import type { SessionResponse } from "@/lib/types";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender
 
-export default async function SessionPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function SessionPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const supabase = getSupabase();        // ⬅️ create client inside
 
   const { data: session, error } = await supabase
     .from("sessions")
-    .select("*")
+    .select("*, session_responses(*)")
     .eq("id", id)
     .single();
 
   if (error || !session) {
     return <p className="p-6">Session not found</p>;
   }
+
+  const responses = (session.session_responses ?? []) as SessionResponse[];
 
   return (
     <main className="min-h-screen p-6 max-w-md mx-auto">
@@ -37,11 +44,7 @@ export default async function SessionPage({ params }: { params: { id: string } }
         </div>
       )}
 
-      <div className="space-y-2">
-        <CheckoutButton sessionId={id} />
-        <button className="w-full rounded-xl border py-3">Join Waitlist</button>
-        <button className="w-full text-gray-500 text-sm">View Policy</button>
-      </div>
+      <RsvpControls sessionId={id} initialResponses={responses} />
 
       <div className="mt-6 space-y-3 border-t pt-4">
         <p className="text-sm font-medium text-gray-700">Admin actions</p>
