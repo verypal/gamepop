@@ -1,5 +1,9 @@
 create extension if not exists "uuid-ossp";
 
+create type if not exists contact_type as enum ('email', 'phone_whatsapp');
+
+create type if not exists response_status as enum ('in', 'out', 'maybe');
+
 create table if not exists public.session_responses (
   id uuid primary key default uuid_generate_v4(),
   session_id uuid not null references public.sessions(id) on delete cascade,
