@@ -2,6 +2,7 @@ import Link from "next/link";
 import CheckoutButton from "@/components/CheckoutButton";
 import { getSupabase } from "@/lib/supabaseClient";
 import { deleteSession } from "@/app/admin/sessions/actions";
+import RsvpForm from "./RsvpForm";
 
 export const dynamic = "force-dynamic";  // ⬅️ stop static prerender
 
@@ -41,6 +42,10 @@ export default async function SessionPage({ params }: { params: { id: string } }
         <CheckoutButton sessionId={id} />
         <button className="w-full rounded-xl border py-3">Join Waitlist</button>
         <button className="w-full text-gray-500 text-sm">View Policy</button>
+      </div>
+
+      <div className="mt-6">
+        <RsvpForm sessionId={id} />
       </div>
 
       <div className="mt-6 space-y-3 border-t pt-4">
