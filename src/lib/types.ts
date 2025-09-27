@@ -1,6 +1,16 @@
-export type ContactType = "email" | "phone_whatsapp" | (string & {});
+export const CONTACT_TYPES = ["email", "phone_whatsapp"] as const;
+export type ContactType = (typeof CONTACT_TYPES)[number];
 
-export type ResponseStatus = "in" | "out" | "maybe" | (string & {});
+export const RESPONSE_STATUSES = ["in", "out", "maybe"] as const;
+export type ResponseStatus = (typeof RESPONSE_STATUSES)[number];
+
+export function isContactType(value: string): value is ContactType {
+  return (CONTACT_TYPES as readonly string[]).includes(value);
+}
+
+export function isResponseStatus(value: string): value is ResponseStatus {
+  return (RESPONSE_STATUSES as readonly string[]).includes(value);
+}
 
 export type SessionResponse = {
   id: string;
