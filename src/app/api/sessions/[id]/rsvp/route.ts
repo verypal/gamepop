@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ContactType, ResponseStatus, SessionResponse } from "@/lib/types";
+import {
+  isContactType,
+  isResponseStatus,
+  type ContactType,
+  type ResponseStatus,
+  type SessionResponse,
+} from "@/lib/types";
 
 function createSupabase(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,12 +34,23 @@ type NormalisedRsvp = {
   status: ResponseStatus | null;
 };
 
-const validStatuses: ResponseStatus[] = ["in", "out", "maybe"];
-const validContacts: ContactType[] = ["email", "phone_whatsapp"];
+type NormaliseError =
+  | { type: "missing_player_name"; message: string }
+  | { type: "invalid_contact"; message: string; value: string }
+  | { type: "invalid_status"; message: string; value: string };
 
-function normalise(body: RsvpRequestBody): NormalisedRsvp | null {
+type NormaliseResult =
+  | { success: true; value: NormalisedRsvp }
+  | { success: false; error: NormaliseError };
+
+function normalise(body: RsvpRequestBody): NormaliseResult {
   const playerName = typeof body.playerName === "string" ? body.playerName.trim() : "";
-  if (!playerName) return null;
+  if (!playerName) {
+    return {
+      success: false,
+      error: { type: "missing_player_name", message: "Player name is required" },
+    };
+  }
 
   const emailRaw = typeof body.email === "string" ? body.email.trim() : "";
   const phoneRaw = typeof body.phoneWhatsapp === "string" ? body.phoneWhatsapp.trim() : "";
@@ -42,23 +59,47 @@ function normalise(body: RsvpRequestBody): NormalisedRsvp | null {
 
   const email = emailRaw || null;
   const phoneWhatsapp = phoneRaw || null;
-  const preferredContact = preferredRaw
-    ? (validContacts.includes(preferredRaw as ContactType)
-        ? (preferredRaw as ContactType)
-        : preferredRaw)
-    : null;
-  const status = statusRaw
-    ? (validStatuses.includes(statusRaw as ResponseStatus)
-        ? (statusRaw as ResponseStatus)
-        : statusRaw)
-    : null;
+  let preferredContact: ContactType | null = null;
+  if (preferredRaw) {
+    if (isContactType(preferredRaw)) {
+      preferredContact = preferredRaw;
+    } else {
+      return {
+        success: false,
+        error: {
+          type: "invalid_contact",
+          message: `Unsupported preferred contact method: ${preferredRaw}`,
+          value: preferredRaw,
+        },
+      };
+    }
+  }
+
+  let status: ResponseStatus | null = null;
+  if (statusRaw) {
+    if (isResponseStatus(statusRaw)) {
+      status = statusRaw;
+    } else {
+      return {
+        success: false,
+        error: {
+          type: "invalid_status",
+          message: `Unsupported RSVP status: ${statusRaw}`,
+          value: statusRaw,
+        },
+      };
+    }
+  }
 
   return {
-    playerName,
-    email,
-    phoneWhatsapp,
-    preferredContact,
-    status,
+    success: true,
+    value: {
+      playerName,
+      email,
+      phoneWhatsapp,
+      preferredContact,
+      status,
+    },
   };
 }
 
@@ -174,15 +215,24 @@ export async function POST(
     }
 
     const normalised = normalise(json);
-    if (!normalised) {
-      return NextResponse.json({ error: "Player name is required" }, { status: 400 });
+    if (!normalised.success) {
+      const { error } = normalised;
+      if (
+        error.type === "invalid_contact" ||
+        error.type === "invalid_status" ||
+        error.type === "missing_player_name"
+      ) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+
+      return NextResponse.json({ error: "Invalid RSVP payload" }, { status: 400 });
     }
 
     const supabase = createSupabase();
     const { response, created } = await upsertResponse(
       supabase,
       sessionId,
-      normalised
+      normalised.value
     );
 
     return NextResponse.json(response, { status: created ? 201 : 200 });
